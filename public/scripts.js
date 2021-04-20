@@ -24,12 +24,12 @@ const PhotosUpload = {
     PhotosUpload.input = event.target
     
     if (PhotosUpload.hasLimit(event)) return
-     
+
     Array.from(fileList).forEach(file => { 
 
       PhotosUpload.files.push(file)
 
-      const reader = new FileReader() // Formato blob
+      const reader = new FileReader()
 
       reader.onload = () => {
         const image = new Image()
@@ -56,7 +56,6 @@ const PhotosUpload = {
     }
 
     const photosDiv = []
-    console.log(preview.childNodes)
     preview.childNodes.forEach(item => {
       if (item.classList && item.classList.value == "photo") {
         photosDiv.push(item)
@@ -77,8 +76,6 @@ const PhotosUpload = {
 
     PhotosUpload.files.forEach(file => dataTransfer.items.add(file))
     
-    console.log(dataTransfer) // Retorna um objeto DataTransfer que uma das coisas dentro dele, é um files. E dentro desse files, ta uma fileList com os arquivos selecionados
-
     return dataTransfer.files
   },
   getContainer(image) {
