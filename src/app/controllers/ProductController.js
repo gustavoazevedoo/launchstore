@@ -1,10 +1,10 @@
 const { formatPrice } = require("../../lib/utils")
 const Category = require('../models/Category')
 const Product = require('../models/Product')
+const File = require('../models/File')
 
 module.exports = {
   create(req, res) {
-    // Pegar Categorias
     Category.all().then((results) => {
       const categories = results.rows;
 
@@ -22,10 +22,17 @@ module.exports = {
       }
     }
 
+    if (req.files.length == 0) {
+      return res.send("Please, send at least one image")
+    }
+    
     let results = await Product.create(req.body)
     const productId = results.rows[0].id
 
-    return res.redirect(`products/${productId}`)
+    const filesPromise = req.files.map(file => File.create({...file, product_id: productId}))
+    await Promise.all(filesPromise)
+
+    return res.redirect(`products/${productId}/edit`)
   },
   async edit(req, res) {
     let results = await Product.find(req.params.id)
@@ -42,7 +49,6 @@ module.exports = {
     return res.render("products/edit.njk", { product, categories })
   },
   async put(req, res) {
-    // Verificando se todos campos estão preenchidos
     const keys = Object.keys(req.body)
 
     for (key of keys) {
@@ -51,21 +57,13 @@ module.exports = {
       }
     }
   
-    // AJUSTANDO DADOS ANTES DE SALVAR NO BANCO
-
-    // Pego o campo price e gravo no banco sem os caraceres especiais e virgulas e pontos
     req.body.price = req.body.price.replace(/\D/g, "")
 
-    // Se tiver um old_price diferente do preço
     if (req.body.old_price != req.body.price) {
-      // EU pego o produto
       const oldProduct = await Product.find(req.body.id)
-
-      // e atualizo o valor do old_price, com o valor do price que tava (logo antes de atualizar)
       req.body.old_price = oldProduct.rows[0].price
     }
 
-    // Atualizo o produto
     await Product.update(req.body) 
 
     return res.redirect(`/products/${req.body.id}/edit`)
