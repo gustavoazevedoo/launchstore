@@ -51,7 +51,7 @@ const PhotosUpload = {
 
     if (fileList.length > uploadLimit) { 
       alert(`Envie no máximo ${uploadLimit} fotos`)
-      event.preventDefaulft()
+      event.preventDefault()
       return true
     }
 
@@ -65,7 +65,7 @@ const PhotosUpload = {
     const totalPhotos = fileList.length + photosDiv.length 
     if (totalPhotos > uploadLimit) {
       alert("Você atingiu o limite máximo de fotos")
-      event.preventDefaulft()
+      event.preventDefault()
       return true
     }
     
@@ -107,6 +107,19 @@ const PhotosUpload = {
 
     PhotosUpload.files.splice(index, 1)
     PhotosUpload.input.files = PhotosUpload.getAllFiles()
+
+    photoDiv.remove()
+  },
+  removeOldPhoto(event) {
+    const photoDiv = event.target.parentNode
+    console.log(photoDiv)
+
+    if (photoDiv.id) {
+      const removedFiles = document.querySelector('input[name="removed_files"')
+      if(removedFiles) {
+        removedFiles.value += `${photoDiv.id},`
+      }
+    } 
 
     photoDiv.remove()
   }
